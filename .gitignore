@@ -1,0 +1,52 @@
+# -----------------------------------------------------------------------------
+# ✅ Core Terraform files (auto-generated)
+# -----------------------------------------------------------------------------
+.terraform/             # Local provider and module cache
+.terraform.lock.hcl     # (optional, see note below)
+
+# -----------------------------------------------------------------------------
+# ✅ State files (contain secrets!)
+# -----------------------------------------------------------------------------
+*.tfstate
+*.tfstate.*
+crash.log               # Debug crash logs (may contain credentials)
+crash.*.log
+
+# -----------------------------------------------------------------------------
+# ✅ Terraform variable files (often contain secrets)
+# -----------------------------------------------------------------------------
+terraform.tfvars
+*.auto.tfvars
+*.tfvars.json
+
+# -----------------------------------------------------------------------------
+# ✅ Local environment / override configs
+# -----------------------------------------------------------------------------
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# -----------------------------------------------------------------------------
+# ✅ Sensitive CLI configs
+# -----------------------------------------------------------------------------
+.terraformrc
+terraform.rc
+
+# -----------------------------------------------------------------------------
+# ✅ Misc editor / OS / tooling cruft
+# -----------------------------------------------------------------------------
+# macOS / Windows
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# Python / Direnv / Shell utilities
+.env
+.envrc
+*.pyc
+__pycache__/
