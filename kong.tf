@@ -10,17 +10,24 @@ resource "konnect_event_gateway_backend_cluster" "backend_cluster" {
     gateway_id = konnect_event_gateway.event_gateway_terraform.id
 
     authentication = {
-        anonymous = {}
+        sasl_scram = {
+            algorithm = "sha512"
+            username  = "username"
+            password  = "$${env['KAFKA_PASSWORD']}"
+        }
     }
 
     bootstrap_servers = [
-        "kafka1:9092",
-        "kafka2:9092",
-        "kafka3:9092"
+        "b-1.xxx.kafka.us-west-2.amazonaws.com:9096",
+        "b-2.xxx.kafka.us-west-2.amazonaws.com:9096",
+        "b-3.xxx.kafka.us-west-2.amazonaws.com:9096",
     ]
 
-    insecure_allow_anonymous_virtual_cluster_auth = true
+    tls = {
+        enabled = false
+    }
 
+    insecure_allow_anonymous_virtual_cluster_auth = true
 }
 
 resource "konnect_event_gateway_virtual_cluster" "virtual_cluster" {
