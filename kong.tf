@@ -44,7 +44,9 @@ resource "konnect_event_gateway_virtual_cluster" "virtual_cluster" {
     dns_label = "vcluster-1"
 
     authentication = [ {
-      anonymous = {}
+      sasl_scram = {
+        algorithm = "sha512"
+      }
     } ]
 }
 
