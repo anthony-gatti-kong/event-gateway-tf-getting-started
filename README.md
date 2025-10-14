@@ -51,9 +51,10 @@ kafkactl --context user2 produce orders --value="{'customer'='acme','sku'=123}"
 
 8. Show `user1` cannot produce to the parts topic.
 ```{shell}
-
+kafkactl --context user1 produce parts --value="{'id'=1,'name'='compactor'}"
 ```
 
 9. Quickly give `user1` write access to the parts topic via uncomment.
+```{shell}
+kafkactl --context user1 produce parts --value="{'id'=1,'name'='compactor'}"
 ```
-
