@@ -1,0 +1,18 @@
+contexts:
+    backend:
+      brokers:
+        - localhost:9094
+    user1:
+      brokers:
+        - localhost:19092
+      sasl:
+        enabled: true
+        username: user1
+        password: password1
+    user2:
+      brokers:
+        - localhost:19092
+      sasl:
+        enabled: true
+        username: user2
+        password: password2
