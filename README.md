@@ -58,3 +58,58 @@ kafkactl --context user1 produce parts --value="{'id'=1,'name'='compactor'}"
 ```{shell}
 kafkactl --context user1 produce parts --value="{'id'=1,'name'='compactor'}"
 ```
+
+# Curl commands to set up data plane
+
+1. Reset the environment variables for the account.
+```{shell}
+export KONNECT_API_TOKEN=${TF_VAR_konnect_api_token}
+export KONNECT_URL="https://us.api.konghq.com"
+```
+
+2. Create control plane.
+```{shell}
+curl --request POST \
+        --url  "${KONNECT_URL}/v1/event-gateways" \
+        --header "Accept: application/json, application/problem+json" \
+        --header "Authorization: Bearer ${KONNECT_API_TOKEN}" \
+        --header "Content-Type: application/json" \
+        --data '{
+            "name": "konnect_api_cp"  
+        }'
+```
+This will return the control plane ID.
+
+3. Export the control plane ID.
+```{shell}
+export KONNECT_CP_ID=<cp-id>
+```
+
+4. Create backend cluster.
+```{shell}
+curl --request POST \
+  --url "${KONNECT_URL}/v1/event-gateways/${KONNECT_CP_ID}/backend-clusters" \
+  --header 'Accept: application/json, application/problem+json' \
+  --header "Authorization: Bearer ${KONNECT_API_TOKEN}" \
+  --header 'Content-Type: application/json' \
+  --data '{
+        "name": "new-backend-cluster",
+        "authentication": {
+            "type": "sasl_scram",
+            "algorithm": "sha512",
+            "username": "my-username",
+            "password": "'${env["KAFKA_PASSWORD"]}'"
+        },
+        "bootstrap_servers": [ 
+            "kafka1:9092",
+            "kafka2:9092",
+            "kafka3:9092"
+        ],
+        "tls": {
+            "enabled": false
+        }
+    }'
+```
+This will return the backend cluster ID.
+
+
