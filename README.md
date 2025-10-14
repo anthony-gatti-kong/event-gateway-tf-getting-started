@@ -192,7 +192,99 @@ curl --request POST \
 ```
 
 11. Add ACL policy 1 on virtual cluster.
-TODO
+```{shell}
+curl --request POST \
+  --url "${KONNECT_URL}/v1/event-gateways/${KONNECT_CP_ID}/virtual-clusters/${KONNECT_VC_ID}/cluster-policies" \
+  --header 'Accept: application/json, application/problem+json' \
+  --header "Authorization: Bearer ${KONNECT_API_TOKEN}" \
+  --header 'Content-Type: application/json' \
+  --data '{
+        "type": "acls",
+        "name": "acl_policy_1",
+        "condition": "context.auth.principal.name == \"user1\"",
+        "config": {
+            "rules": [
+                {
+                "resource_type": "topic",
+                "resource_names": [
+                    {
+                        "match": "*"
+                    }
+                ],
+                "operations": [
+                    {
+                        "name": "describe"
+                    }
+                ],
+                    "action": "allow"
+                },
+                {
+                "resource_type": "topic",
+                "resource_names": [
+                    {
+                        "match": "orders"
+                    },
+                    {
+                        "match": "parts"
+                    }
+                ],
+                "operations": [
+                    {
+                        "name": "write"
+                    }
+                ],
+                    "action": "allow"
+                }
+            ]
+        }
+    }'
+```
 
 12. Add ACL policy 2 on virtual cluster.
-TODO
+```{shell}
+curl --request POST \
+  --url "${KONNECT_URL}/v1/event-gateways/${KONNECT_CP_ID}/virtual-clusters/${KONNECT_VC_ID}/cluster-policies" \
+  --header 'Accept: application/json, application/problem+json' \
+  --header "Authorization: Bearer ${KONNECT_API_TOKEN}" \
+  --header 'Content-Type: application/json' \
+  --data '{
+        "type": "acls",
+        "name": "acl_policy_2",
+        "condition": "context.auth.principal.name == \"user2\"",
+        "config": {
+            "rules": [
+                {
+                "resource_type": "topic",
+                "resource_names": [
+                    {
+                        "match": "orders"
+                    },
+                    {
+                        "match": "parts"
+                    }
+                ],
+                "operations": [
+                    {
+                        "name": "describe"
+                    }
+                ],
+                    "action": "allow"
+                },
+                {
+                "resource_type": "topic",
+                "resource_names": [
+                    {
+                        "match": "orders"
+                    }
+                ],
+                "operations": [
+                    {
+                        "name": "read"
+                    }
+                ],
+                    "action": "allow"
+                }
+            ]
+        }
+    }'
+```
