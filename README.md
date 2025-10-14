@@ -112,4 +112,87 @@ curl --request POST \
 ```
 This will return the backend cluster ID.
 
+5. Set backend cluster ID.
+```{shell}
+export KONNECT_BC_ID=<cluster-id>
+```
 
+6. Create virtual cluster.
+```{shell}
+curl --request POST \
+  --url "${KONNECT_URL}/v1/event-gateways/${KONNECT_CP_ID}/virtual-clusters" \
+  --header 'Accept: application/json, application/problem+json' \
+  --header "Authorization: Bearer ${KONNECT_API_TOKEN}" \
+  --header 'Content-Type: application/json' \
+  --data '{
+        "name": "my-virtual-cluster",
+        "destination": {
+            "id": "'${KONNECT_BC_ID}'"
+        },
+        "authentication": [
+            {
+                "type": "sasl_scram",
+                "algorithm": "sha512"
+            }
+        ],
+        "acl_mode": "enforce_on_gateway",
+        "dns_label": "vcluster-1"
+    }'
+```
+This will return the virtual cluster ID.
+
+7. Set virtual cluster ID.
+```{shell}
+export KONNECT_VC_ID=<vc-id>
+```
+
+8. Add listener to virtual cluster.
+```{shell}
+curl --request POST \
+    --url "${KONNECT_URL}/v1/event-gateways/${KONNECT_CP_ID}/listeners" \
+    --header 'Accept: application/json, application/problem+json' \
+    --header "Authorization: Bearer ${KONNECT_API_TOKEN}" \
+    --header 'Content-Type: application/json' \
+    --data '{
+        "name": "my-listener",
+        "addresses": [
+            "0.0.0.0"
+        ],
+        "ports": [
+            "19092-19101"
+        ]
+    }'
+```
+This will return the listener ID.
+
+9. Set the listener ID.
+```{shell}
+export KONNECT_LISTENER_ID=<listener-id>
+```
+
+10. Create a forward-to-vc policy on the listener.
+```{shell}
+curl --request POST \
+    --url "${KONNECT_URL}/v1/event-gateways/${KONNECT_CP_ID}/listeners/${KONNECT_LISTENER_ID}/policies" \
+    --header 'Accept: application/json, application/problem+json' \
+    --header "Authorization: Bearer ${KONNECT_API_TOKEN}" \
+    --header 'Content-Type: application/json' \
+    --data '{
+        "type": "forward_to_virtual_cluster",
+        "name": "forward-policy",
+        "config": {
+            "type": "port_mapping",
+            "bootstrap_port": "at_start",
+            "advertised_host": "localhost",
+            "destination": {
+                "id": "'${KONNECT_VC_ID}'"
+            }
+        }
+    }'
+```
+
+11. Add ACL policy 1 on virtual cluster.
+TODO
+
+12. Add ACL policy 2 on virtual cluster.
+TODO
