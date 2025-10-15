@@ -16,3 +16,10 @@ contexts:
         enabled: true
         username: user2
         password: password2
+    user3:
+      brokers:
+        - localhost:19102
+      sasl:
+        enabled: true
+        username: user3
+        password: password3

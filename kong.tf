@@ -109,11 +109,7 @@ resource "konnect_event_gateway_cluster_policy_acls" "acl_topic_policy_u1" {
                 ]
                 resource_type = "topic"
                 resource_names = [{
-                    match = "orders"
-                }
-                // Uncomment for demo to flip ACLs programmatically
-                ,{
-                    match = "parts"
+                    match = "*"
                 }
                 ]
             }
@@ -158,6 +154,17 @@ resource "konnect_event_gateway_cluster_policy_acls" "acl_topic_policy_u2" {
     }
 }
 
+// Add skip record policy on orders topic
+resource "konnect_event_gateway_consume_policy_skip_record" "skip_record" {
+    provider = konnect-beta
+    name = "skip_records"
+    description = "skip records"
+    gateway_id = konnect_event_gateway.event_gateway_terraform.id
+    virtual_cluster_id = konnect_event_gateway_virtual_cluster.virtual_cluster.id
+
+    condition = "context.auth.principal.name == 'user2' && record.headers['my-header'] == 'value'"
+}
+
 // Listener configuration
 resource "konnect_event_gateway_listener" "listener" {
     provider = konnect-beta
@@ -188,3 +195,61 @@ resource "konnect_event_gateway_listener_policy_forward_to_virtual_cluster" "for
     }
 }
 
+// Second virtual cluster
+resource "konnect_event_gateway_virtual_cluster" "virtual_cluster2" {
+    provider = konnect-beta
+    name = "virtual_cluster_teamb"
+    description = "terraform virtual cluster"
+    gateway_id = konnect_event_gateway.event_gateway_terraform.id
+
+    destination = {
+      id = konnect_event_gateway_backend_cluster.backend_cluster.id
+    }
+
+    // acl_mode = "passthrough"
+    acl_mode = "passthrough"
+    dns_label = "vcluster-2"
+
+    namespace = {
+      prefix = "team2-"
+      mode = "hide_prefix"
+    }
+
+    authentication = [ {
+      sasl_plain = {
+        mediation = "terminate"
+        principals = [
+          { username = "user3", password = "$${env['USER3_PASSWORD']}" },
+        ]
+      }
+    } ]
+}
+
+resource "konnect_event_gateway_listener" "listener_teamb" {
+    provider = konnect-beta
+    name = "konnect_listener2"
+    description = "terraform listener"
+    gateway_id = konnect_event_gateway.event_gateway_terraform.id
+
+    addresses = ["0.0.0.0"]
+    ports = ["19102-19112"]
+}
+
+resource "konnect_event_gateway_listener_policy_forward_to_virtual_cluster" "forward_to_vcluster_teamb" {
+    provider = konnect-beta
+    name = "forward_to_vcluster2"
+    description = "forward to vcluster policy"
+    gateway_id = konnect_event_gateway.event_gateway_terraform.id
+    event_gateway_listener_id = konnect_event_gateway_listener.listener_teamb.id
+
+    config = {
+        port_mapping = {
+            advertised_host = "localhost"
+            destination = {
+                virtual_cluster_reference_by_id = {
+                    id = konnect_event_gateway_virtual_cluster.virtual_cluster2.id
+                }
+            }
+        }
+    }
+}
