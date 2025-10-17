@@ -81,7 +81,6 @@ resource "konnect_event_gateway_virtual_cluster" "virtual_cluster" {
     */
 }
 
-
 // Add ACL policy for user1
 resource "konnect_event_gateway_cluster_policy_acls" "acl_topic_policy_u1" {
     provider = konnect-beta
@@ -139,6 +138,8 @@ resource "konnect_event_gateway_cluster_policy_acls" "acl_topic_policy_u2" {
                     match = "orders"
                 },{
                     match = "parts"
+                },{
+                    match = "extra-topic"
                 }]
             },{
                 action = "allow"
@@ -154,7 +155,7 @@ resource "konnect_event_gateway_cluster_policy_acls" "acl_topic_policy_u2" {
     }
 }
 
-// Add skip record policy on orders topic
+// Add skip record policy on orders topic based on header & principal
 resource "konnect_event_gateway_consume_policy_skip_record" "skip_record" {
     provider = konnect-beta
     name = "skip_records"
@@ -163,6 +164,34 @@ resource "konnect_event_gateway_consume_policy_skip_record" "skip_record" {
     virtual_cluster_id = konnect_event_gateway_virtual_cluster.virtual_cluster.id
 
     condition = "context.auth.principal.name == 'user2' && record.headers['my-header'] == 'value'"
+}
+
+
+// Add skip record policy within a payload by marshaling it on consume.
+resource "konnect_event_gateway_consume_policy_schema_validation" "schema_val" {
+    provider = konnect-beta
+    name = "schema-val"
+    description = "serialize for record parsing"
+    gateway_id = konnect_event_gateway.event_gateway_terraform.id
+    virtual_cluster_id = konnect_event_gateway_virtual_cluster.virtual_cluster.id
+    
+    config = {
+        type = "json"
+        key_validation_action = "mark"
+        value_validation_action = "skip"
+    }
+}
+
+// Add skip record policy on records based on record conten
+resource "konnect_event_gateway_consume_policy_skip_record" "skip_record_val" {
+    provider = konnect-beta
+    name = "skip_records_2"
+    description = "skip records"
+    gateway_id = konnect_event_gateway.event_gateway_terraform.id
+    virtual_cluster_id = konnect_event_gateway_virtual_cluster.virtual_cluster.id
+
+    condition = "record.value.content['field1'] == 'field2'"
+    parent_policy_id = konnect_event_gateway_consume_policy_schema_validation.schema_val.id
 }
 
 // Listener configuration
