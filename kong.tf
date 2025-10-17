@@ -95,24 +95,15 @@ resource "konnect_event_gateway_cluster_policy_acls" "acl_topic_policy_u1" {
             {
                 action = "allow"
                 operations = [
-                    { name = "describe" }
-                ]
-                resource_type = "topic"
-                resource_names = [{
-                    match = "*"
-                }]
-            },{
-                action = "allow"
-                operations = [
+                    { name = "describe" },
+                    { name = "read" },
                     { name = "write" }
                 ]
                 resource_type = "topic"
                 resource_names = [{
                     match = "*"
-                }
-                ]
+                }]
             }
-        
         ]
     }
 }
@@ -163,9 +154,8 @@ resource "konnect_event_gateway_consume_policy_skip_record" "skip_record" {
     gateway_id = konnect_event_gateway.event_gateway_terraform.id
     virtual_cluster_id = konnect_event_gateway_virtual_cluster.virtual_cluster.id
 
-    condition = "context.auth.principal.name == 'user2' && record.headers['my-header'] == 'value'"
+    condition = "record.headers['my-header'] == 'value' && context.auth.principal.name != 'user1'"
 }
-
 
 // Add skip record policy within a payload by marshaling it on consume.
 resource "konnect_event_gateway_consume_policy_schema_validation" "schema_val" {
@@ -178,7 +168,7 @@ resource "konnect_event_gateway_consume_policy_schema_validation" "schema_val" {
     config = {
         type = "json"
         key_validation_action = "mark"
-        value_validation_action = "skip"
+        value_validation_action = "mark"
     }
 }
 
@@ -190,8 +180,8 @@ resource "konnect_event_gateway_consume_policy_skip_record" "skip_record_val" {
     gateway_id = konnect_event_gateway.event_gateway_terraform.id
     virtual_cluster_id = konnect_event_gateway_virtual_cluster.virtual_cluster.id
 
-    condition = "record.value.content['field1'] == 'field2'"
     parent_policy_id = konnect_event_gateway_consume_policy_schema_validation.schema_val.id
+    condition = "record.value.content['field1'] == 'pii_value'"
 }
 
 // Listener configuration
