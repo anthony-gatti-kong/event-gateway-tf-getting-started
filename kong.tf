@@ -68,6 +68,22 @@ resource "konnect_event_gateway_virtual_cluster" "virtual_cluster" {
     acl_mode = "enforce_on_gateway"
     dns_label = "vcluster-1"
 
+    namespace = {
+      prefix = "team1-"
+      mode = "hide_prefix"
+      additional = {
+        consumer_groups = [{}]
+        topics = [ {
+          exact_list = {
+            conflict = "warn"
+            exact_list = [{
+              backend = "extra-topic"
+            }]
+          }
+        } ]
+      }
+    }
+
     /* For real demo - use MSK with SCRAM
     authentication = [ {
       sasl_scram = {
