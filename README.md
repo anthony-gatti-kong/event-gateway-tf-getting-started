@@ -68,7 +68,7 @@ kafkactl --context user1 produce parts --value="{'id':1,'name':'compactor'}"
 
 Terminal 0:
 ```{shell}
-kafkactl --context backend produce team1-orders --value="{'id':1,'name':'test'}" --header sandbox:1
+kafkactl --context backend produce team1-orders --value='{"id":1,"name":"test"}' --header sandbox:1
 ```
 
 Terminal 1:
@@ -86,8 +86,8 @@ kafkactl --context user2 consume orders -b
 
 Terminal 0:
 ```{shell}
-kafkactl --context backend produce team1-orders --value="{'id':1,'name':'test'}" --header sandbox:1
-kafkactl --context backend produce team1-orders --value="{'id':1,'name':'pii_value'}" --header sandbox:1
+kafkactl --context backend produce team1-orders --value='{"id":1,"name":"test"}' --header sandbox:1
+kafkactl --context backend produce team1-orders --value='{"id":1,"name":"pii_value"}' --header sandbox:1
 ```
 
 Terminal 1:
