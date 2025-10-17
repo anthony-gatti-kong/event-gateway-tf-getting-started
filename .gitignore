@@ -50,3 +50,10 @@ Thumbs.db
 .envrc
 *.pyc
 __pycache__/
+
+# Data plane
+.dp-config
+
+# Presentation
+intro.png
+copy-paste.png

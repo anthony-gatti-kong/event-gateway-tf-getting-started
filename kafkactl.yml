@@ -1,0 +1,29 @@
+contexts:
+    backend:
+      brokers:
+        - localhost:9094
+      sasl:
+        mechanism: scram-sha512
+        username: testuser1
+        password: testpassword11
+    user1:
+      brokers:
+        - localhost:19092
+      sasl:
+        enabled: true
+        username: user1
+        password: password1
+    user2:
+      brokers:
+        - localhost:19092
+      sasl:
+        enabled: true
+        username: user2
+        password: password2
+    user3:
+      brokers:
+        - localhost:19102
+      sasl:
+        enabled: true
+        username: user3
+        password: password3
