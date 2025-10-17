@@ -160,7 +160,7 @@ resource "konnect_event_gateway_consume_policy_skip_record" "skip_record" {
     gateway_id = konnect_event_gateway.event_gateway_terraform.id
     virtual_cluster_id = konnect_event_gateway_virtual_cluster.virtual_cluster.id
 
-    condition = "record.headers['my-header'] == 'value' && context.auth.principal.name != 'user1'"
+    condition = "record.headers['sandbox'] == '1' && context.auth.principal.name != 'user1'"
 }
 
 // Add skip record policy within a payload by marshaling it on consume.
@@ -170,6 +170,7 @@ resource "konnect_event_gateway_consume_policy_schema_validation" "schema_val" {
     description = "serialize for record parsing"
     gateway_id = konnect_event_gateway.event_gateway_terraform.id
     virtual_cluster_id = konnect_event_gateway_virtual_cluster.virtual_cluster.id
+    depends_on = [ konnect_event_gateway_consume_policy_skip_record.skip_record ]
     
     config = {
         type = "json"
@@ -185,9 +186,10 @@ resource "konnect_event_gateway_consume_policy_skip_record" "skip_record_val" {
     description = "skip records"
     gateway_id = konnect_event_gateway.event_gateway_terraform.id
     virtual_cluster_id = konnect_event_gateway_virtual_cluster.virtual_cluster.id
+    depends_on = [ konnect_event_gateway_consume_policy_schema_validation.schema_val ]
 
     parent_policy_id = konnect_event_gateway_consume_policy_schema_validation.schema_val.id
-    condition = "record.value.content['field1'] == 'pii_value'"
+    condition = "record.value.content['name'] == 'pii_value'"
 }
 
 resource "konnect_event_gateway_listener" "listener" {
