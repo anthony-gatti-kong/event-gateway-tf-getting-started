@@ -190,7 +190,6 @@ resource "konnect_event_gateway_consume_policy_schema_validation" "schema_val" {
     
     config = {
         type = "json"
-        key_validation_action = "mark"
         value_validation_action = "mark"
     }
 }
