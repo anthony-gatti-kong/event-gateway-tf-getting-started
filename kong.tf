@@ -204,7 +204,7 @@ resource "konnect_event_gateway_consume_policy_skip_record" "skip_record_val" {
     depends_on = [ konnect_event_gateway_consume_policy_schema_validation.schema_val ]
 
     parent_policy_id = konnect_event_gateway_consume_policy_schema_validation.schema_val.id
-    condition = "record.value.content['name'] == 'pii_value'"
+    condition = "record.value.content['name'].startsWith('pii')"
 }
 
 resource "konnect_event_gateway_listener" "listener" {

@@ -88,6 +88,8 @@ Terminal 0:
 ```shell
 kafkactl --context backend produce team1-orders --value='{"id":1,"name":"test"}' --header sandbox:1
 kafkactl --context backend produce team1-orders --value='{"id":1,"name":"pii_value"}' --header sandbox:1
+kafkactl --context backend produce team1-orders --value='{"id":1,"name":"pii_other"}' --header sandbox:1
+
 ```
 
 Terminal 1:
@@ -351,11 +353,10 @@ curl --request POST \
   --header 'Content-Type: application/json' \
   --data '{
         "type": "schema_validation",
-        "name": "Consume schema validation",
+        "name": "Consume schema validation 2",
         "description": "Serialize records for record-level filtering",
         "config": {
             "type": "json",
-            "key_validation_action": "mark",
             "value_validation_action": "mark"
         }
   }'
@@ -378,6 +379,12 @@ curl --request POST \
         "type": "skip_record",
         "name": "Skip record policy based on record content",
         "description": "Skip records when record field contains specific value",
-        "condition": "record.value.content[\"name\"] == \"pii_value\""
+        "condition": "record.value.content[\"name\"].startsWith(\"pii\")"
   }'
 ```
+Note the string matching options here are:
+- `startsWith()`
+- `endsWith()`
+- `substring()`
+- `includes()`
+- `length`
