@@ -46,9 +46,9 @@ kafkactl --context user2 list topics
 
 7. Show `user1` can produce to the orders topic successfully. Show `user2` can also read from that topic, but not write to it.
 ```shell
-kafkactl --context user1 produce orders --value="{'customer':'acme','sku':123}"
+kafkactl --context user1 produce orders --value='{"customer":"acme","sku":123}'
 kafkactl --context user2 consume orders -b
-kafkactl --context user2 produce orders --value="{'customer':'acme','sku':123}"
+kafkactl --context user2 produce orders --value='{"customer":"acme","sku":123}'
 ```
 The last command should fail.
 
